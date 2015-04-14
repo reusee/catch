@@ -1,11 +1,13 @@
 package catch
 
-import "fmt"
-
-func Check(info interface{}, err error) {
+func Check(err error, wrapper func(error) error) {
 	if err != nil {
-		panic(fmt.Errorf("%v error - %v", info, err))
+		panic(wrapper(err))
 	}
+}
+
+func Id(err error) error {
+	return err
 }
 
 func Catch(err *error) {

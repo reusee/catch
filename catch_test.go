@@ -8,12 +8,12 @@ import (
 func TestCatch(t *testing.T) {
 	err := func() (err error) {
 		defer Catch(&err)
-		Check("foo", func() error {
+		Check(func() error {
 			return errors.New("Err")
-		}())
+		}(), Id)
 		return
 	}()
-	if err == nil || err.Error() != "foo error - Err" {
+	if err == nil || err.Error() != "Err" {
 		t.Fail()
 	}
 }
@@ -35,5 +35,16 @@ func TestCatch3(t *testing.T) {
 	}()
 	if err == nil || err.Error() != "Err" {
 		t.Fail()
+	}
+}
+
+func BenchmarkCatch(b *testing.B) {
+	var err error
+	e := errors.New("foo")
+	for i := 0; i < b.N; i++ {
+		func() {
+			defer Catch(&err)
+			Check(e, Id)
+		}()
 	}
 }
