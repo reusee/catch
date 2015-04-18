@@ -1,13 +1,26 @@
 package catch
 
-func Check(err error, wrapper func(error) error) {
-	if err != nil {
-		panic(wrapper(err))
-	}
+import "fmt"
+
+type Err struct {
+	Pkg, Info string
+	Err       error
 }
 
-func Id(err error) error {
-	return err
+func (e Err) Error() string {
+	return fmt.Sprintf("%s: %s\n%v", e.Pkg, e.Info, e.Err)
+}
+
+func PkgChecker(pkg string) func(error, string) {
+	return func(err error, info string) {
+		if err != nil {
+			panic(Err{
+				Pkg:  pkg,
+				Info: info,
+				Err:  err,
+			})
+		}
+	}
 }
 
 func Catch(err *error) {

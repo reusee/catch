@@ -6,14 +6,14 @@ import (
 )
 
 func TestCatch(t *testing.T) {
-	err := func() (err error) {
+	var err error
+	check := PkgChecker("test")
+	func() {
 		defer Catch(&err)
-		Check(func() error {
-			return errors.New("Err")
-		}(), Id)
-		return
+		e := errors.New("foobar")
+		check(e, "FOO")
 	}()
-	if err == nil || err.Error() != "Err" {
+	if err == nil || err.Error() != "test: FOO\nfoobar" {
 		t.Fail()
 	}
 }
@@ -38,13 +38,25 @@ func TestCatch3(t *testing.T) {
 	}
 }
 
-func BenchmarkCatch(b *testing.B) {
+func BenchmarkCatchError(b *testing.B) {
 	var err error
 	e := errors.New("foo")
+	check := PkgChecker("bench")
 	for i := 0; i < b.N; i++ {
 		func() {
 			defer Catch(&err)
-			Check(e, Id)
+			check(e, "bench")
+		}()
+	}
+}
+
+func BenchmarkNoError(b *testing.B) {
+	var err error
+	check := PkgChecker("bench")
+	for i := 0; i < b.N; i++ {
+		func() {
+			defer Catch(&err)
+			check(nil, "bench")
 		}()
 	}
 }
