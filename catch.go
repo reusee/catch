@@ -11,8 +11,9 @@ func (e Err) Error() string {
 	return fmt.Sprintf("%s: %s\n%v", e.Pkg, e.Info, e.Err)
 }
 
-func PkgChecker(pkg string) func(error, string) {
-	return func(err error, info string) {
+func PkgChecker(pkg string) func(error, string) bool {
+	return func(err error, info string) (ret bool) {
+		ret = true
 		if err != nil {
 			panic(Err{
 				Pkg:  pkg,
@@ -20,6 +21,8 @@ func PkgChecker(pkg string) func(error, string) {
 				Err:  err,
 			})
 		}
+		ret = false
+		return
 	}
 }
 

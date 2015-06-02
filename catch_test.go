@@ -38,6 +38,18 @@ func TestCatch3(t *testing.T) {
 	}
 }
 
+func TestNoError(t *testing.T) {
+	var err error
+	check := PkgChecker("test")
+	func() {
+		defer Catch(&err)
+		check(nil, "test")
+	}()
+	if err != nil {
+		t.Fail()
+	}
+}
+
 func BenchmarkCatchError(b *testing.B) {
 	var err error
 	e := errors.New("foo")
